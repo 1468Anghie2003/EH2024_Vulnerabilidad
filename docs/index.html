@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Datos sucios a patrones reales · Empleo vulnerable en Bolivia</title>
+<meta name="description" content="Ciencia de datos con la Encuesta de Hogares 2024 (INE): preparación de datos, dos miradas al empleo vulnerable, modelos de aprendizaje automático y un simulador.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <div class="brand">EH·2024 <b>// DATOS SUCIOS → PATRONES REALES</b></div>
+  <div class="navlinks">
+    <a href="#pregunta">La pregunta</a><a href="#datos">Los datos</a><a href="#descriptiva">Primera mirada</a><a href="#metodo">Método</a>
+    <a href="#fases">12 fases</a><a href="#antesdespues">Antes / después</a><a href="#enfoques">Dos miradas</a><a href="#mapas">Mapas</a>
+    <a href="#ocupaciones">Ocupaciones</a><a href="#patrones">Patrones</a><a href="#mincer">Educación</a><a href="#modelado">Modelos</a>
+    <a href="#simulador">Simulador</a><a href="#bitacora">Bitácora</a><a href="#reproducir">Reproducir</a>
+  </div>
+  <div class="prog" id="prog"></div>
+</div></nav>
+
+<header class="hero" id="inicio">
+  <canvas id="net"></canvas>
+  <div class="wrap">
+    <div class="kicker">Seminario · Ciencia de Datos · UMSA Informática · Encuesta de Hogares 2024</div>
+    <h1 class="title"><span class="g">Datos sucios a patrones reales:</span><span class="t2">Empleo vulnerable en Bolivia</span></h1>
+    <p class="lead" id="lead"></p>
+    <div class="rotq"><span class="rq-l">¿SABÍAS QUE…?</span><span id="rotq"></span></div>
+    <div class="reveal3" id="reveal3"></div>
+    <div class="kpis k4" id="kpis"></div>
+    <div class="hero-cta">
+      <a class="btn pri" href="#pregunta">▶ Empezar</a>
+      <a class="btn" href="#fases">Ver las 12 fases</a>
+      <a class="btn" href="#modelado">Modelos</a>
+      <a class="btn" href="#simulador">Probar el simulador</a>
+    </div>
+    <div class="team" id="team"></div>
+  </div>
+  <div class="scrollhint">DESPLAZAR ↓</div>
+</header>
+
+<main>
+<!-- 01 LA PREGUNTA -->
+<section class="sec" id="pregunta"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">01 · LA PREGUNTA</div><h2>¿Quién tiene un empleo vulnerable?</h2></div>
+    <p>No hay una sola respuesta. Depende de <b>dónde se mire</b>: el bolsillo de la persona, el de su hogar o el tipo de trabajo que tiene. Por eso se miden tres tasas sobre las mismas personas: los ocupados de 19 años o más.</p></div>
+  <div class="lens reveal" id="lens"></div>
+  <div class="card reveal story" style="margin-top:18px;--c:var(--lila)">
+    <h3>Un ejemplo para entenderlo</h3>
+    <div class="story-g" id="story"></div>
+    <p class="src">Ejemplo ilustrativo (no es una persona de la encuesta). Las tasas de arriba sí salen de los datos.</p>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--cyan)"><h3>De la encuesta a las personas que se estudian</h3><p>Personas en la muestra en cada paso; entre paréntesis, cuántos bolivianos representan.</p><div id="ch-embudo" class="chart"></div></div>
+    <div class="card" style="--c:var(--lila)"><h3>Tres tasas, tres respuestas</h3><p>Tasa nacional de cada enfoque. La raya muestra el margen de error (intervalo de confianza del 95%).</p><div id="ch-lens" class="chart"></div><div class="neons" id="lens-neon"></div></div>
+  </div>
+  <div class="card reveal faq" style="margin-top:18px" id="faq"></div>
+</div></section>
+
+<!-- 02 LOS DATOS -->
+<section class="sec" id="datos"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">02 · LOS DATOS</div><h2>Lo que hay dentro de persona.csv</h2></div>
+    <p>Una fila por persona y una columna por pregunta del cuestionario. Antes de calcular nada, se mira qué hay, qué falta y qué parece raro.</p></div>
+  <div class="kpis k4 reveal" id="kpis-datos"></div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--cyan)"><h3>¿Qué tipo de información guarda?</h3><p>Las 275 columnas, clasificadas. Toca un sector para ver ejemplos.</p><div id="ch-tipos" class="chart"></div></div>
+    <div class="card" style="--c:var(--pink)"><h3>¿Dónde están los vacíos?</h3><p>Porcentaje de celdas vacías por sección del cuestionario. La mayoría son preguntas que <b>no corresponden</b> a esa persona (por ejemplo, el salario de alguien que no trabaja).</p><div id="ch-vacios" class="chart"></div></div>
+  </div>
+  <div class="sh reveal" style="margin-top:40px"><div><div class="n">DATOS CURIOSOS</div><h2 style="font-size:28px">Lo primero que salta a la vista</h2></div><p>Valores extremos encontrados en los datos tal como llegaron. Toca una tarjeta: atrás está qué se hizo con ese dato.</p></div>
+  <div class="cur reveal" id="cur"></div>
+  <div class="card reveal fmtbox" style="margin-top:22px;--c:var(--amber)">
+    <div class="fmt-g">
+      <div><span class="tag" style="--c:var(--amber)">Antes de abrir un CSV</span><h3 style="margin-top:10px">Cuidado con el formato regional</h3>
+        <p id="fmt-txt"></p>
+        <div class="neons" id="fmt-neon"></div></div>
+      <div><div class="fmt-demo" id="fmt-demo"></div><button class="btn" id="fmt-run" style="margin-top:10px">▶ Simular el cambio de formato</button></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 03 PRIMERA MIRADA -->
+<section class="sec" id="descriptiva"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">03 · PRIMERA MIRADA</div><h2>Estadística descriptiva de los datos originales</h2></div>
+    <p>Elige una variable. Cada medida tiene su explicación: pasa el cursor por las palabras subrayadas.</p></div>
+  <div class="card reveal">
+    <div class="vchips" id="var0"></div>
+    <div class="stats" id="stats0"></div>
+    <div class="grid g2" style="margin-top:14px"><div><h4 class="h4">¿Cómo se reparten los valores?</h4><div id="ch-hist0" class="chart"></div></div><div><h4 class="h4">Caja y bigotes: el centro y los extremos</h4><div id="ch-box0" class="chart"></div></div></div>
+    <div class="key" id="read0"></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--lila)"><h3>Variables de categorías</h3><div class="toolbar"><div class="seg" id="seg-freq"></div></div><div id="ch-freq" class="chart"></div></div>
+    <div class="card" style="--c:var(--amber)"><h3>Escalera de ingresos (deciles)</h3><p>Si se ordena a los ocupados del que menos gana al que más, cada escalón marca un 10% más. Elige el grupo.</p><div class="toolbar"><div class="seg" id="seg-dec"></div></div><div id="ch-dec" class="chart"></div></div>
+  </div>
+</div></section>
+
+<!-- 04 MÉTODO -->
+<section class="sec" id="metodo"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">04 · MÉTODO</div><h2>CRISP-DM: de la pregunta a la respuesta</h2></div>
+    <p>El estándar de la industria para proyectos de ciencia de datos: seis etapas, doce fases en R. Toca una etapa.</p></div>
+  <div class="card reveal crisp"><div id="crisp-svg"></div><div id="crisp-det"></div></div>
+  <div class="card reveal" style="margin-top:18px">
+    <h3>Las 12 fases, reproducidas desde la bitácora</h3><p>El botón recorre, en orden, cada decisión registrada. Abajo a la izquierda se abre el script que la ejecutó.</p>
+    <div class="pipe"><div class="track"><i id="trk"></i></div><div class="nodes" id="nodes"></div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn pri" id="play">▶ Reproducir la ejecución</button>
+      <button class="btn" id="reset">↺ Reiniciar</button>
+      <button class="btn" id="opendock">⌘ Ver scripts</button>
+      <span class="src" id="play-info" style="align-self:center;margin:0"></span>
+    </div>
+    <div class="replay">
+      <div><h4 class="h4">REGISTRO EN VIVO</h4><div class="ticker" id="ticker"></div></div>
+      <div><h4 class="h4">ESTADO DEL DATASET</h4>
+        <div class="meters">
+          <div class="meter" style="--c:var(--neon)"><div class="l">Filas</div><div class="v" id="mt-f">0</div></div>
+          <div class="meter" style="--c:var(--cyan)"><div class="l">Columnas</div><div class="v" id="mt-c">0</div></div>
+          <div class="meter" style="--c:var(--lila)"><div class="l">Decisiones registradas</div><div class="v" id="mt-b">0</div></div>
+          <div class="meter" style="--c:var(--pink)"><div class="l">Filas eliminadas</div><div class="v" id="mt-e">0</div></div>
+        </div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 05 FASES -->
+<section class="sec" id="fases"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">05 · LAS 12 FASES</div><h2>Qué se hizo, qué se encontró y con qué código</h2></div>
+    <p>Cada fase: la explicación, las cifras que dejó, un gráfico para explorar y, al costado, las líneas centrales del script que la ejecuta.</p></div>
+  <div class="phnav reveal" id="phnav"></div>
+  <div id="phases"></div>
+</div></section>
+
+<!-- 06 ANTES / DESPUES -->
+<section class="sec" id="antesdespues"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">06 · ANTES Y DESPUÉS</div><h2>¿Qué cambió con la preparación?</h2></div>
+    <p>“Antes”: los datos como llegaron. “Después”: el dataset preparado en las fases 03 a 08. Elige una variable.</p></div>
+  <div class="card reveal">
+    <div class="vchips" id="var1"></div>
+    <div class="grid g2"><div id="ch-hist1" class="chart lg"></div><div><div class="tscroll" style="max-height:none"><table class="t" id="tb-ad"></table></div><div class="neons" id="ad-neon"></div></div></div>
+  </div>
+  <div class="grid g3 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--neon)"><h3>Calidad del dataset</h3><p>Cuatro dimensiones de calidad, de 0 a 100%.</p><div id="ch-cal0" class="chart"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>Datos que faltaban</h3><p>Dentro de quienes sí debían responder.</p><div id="ch-falt" class="chart"></div></div>
+    <div class="card" style="--c:var(--lila)"><h3>¿Cambiaron las conclusiones?</h3><p>Las mismas pruebas estadísticas, antes y después.</p><div class="tscroll" style="max-height:330px"><table class="t" id="tb-pruebas"></table></div></div>
+  </div>
+</div></section>
+
+<!-- 07 DOS MIRADAS -->
+<section class="sec" id="enfoques"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">07 · DOS MIRADAS</div><h2>Persona contra hogar: ¿miden a la misma gente?</h2></div>
+    <p>Si las dos miradas coincidieran, daría igual cuál usar. No coinciden: el flujo muestra hacia dónde va cada persona.</p></div>
+  <div class="grid g2 reveal">
+    <div class="card" style="--c:var(--lila)"><h3>El cruce de los dos enfoques</h3><p>Ocupados de 19+ (ponderado). Toca un cuadrante.</p><div class="quad" id="quad"></div><div class="neons" id="quad-neon"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>Flujo entre enfoques</h3><p>De izquierda a derecha: enfoque A → enfoque B → categoría del trabajo (enfoque C).</p><div id="ch-sankey" class="chart lg"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card"><h3>Mismo departamento, tres respuestas</h3><div id="ch-3dep" class="chart lg"></div></div>
+    <div class="card"><h3>Por sexo, área y edad</h3><div class="toolbar" style="margin-top:6px"><div class="seg" id="seg-grp"></div></div><div id="ch-grp" class="chart lg"></div></div>
+  </div>
+</div></section>
+
+<!-- 08 MAPAS -->
+<section class="sec" id="mapas"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">08 · TERRITORIO</div><h2>Mapas de Bolivia</h2></div>
+    <p>Elige el indicador. Toca un departamento para ver su ficha.</p></div>
+  <div class="card reveal"><div class="toolbar"><div class="seg" id="seg-map"></div></div>
+    <div class="mapw"><div id="ch-map" class="chart lg" style="min-height:560px"></div><div class="dpanel" id="dpanel"></div></div></div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--lila)"><h3>¿Qué hay dentro del IVL?</h3><p>El Índice de Vulnerabilidad Laboral (0 a 100) combina cinco señales: desempleo, trabajar menos de 40 horas, no aportar a la jubilación, poca educación y la tasa del enfoque. 100 = el departamento más vulnerable.</p><div id="ch-ivlcomp" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--pink)"><h3>Departamento × área × sexo</h3><div id="ch-heat" class="chart lg"></div></div>
+  </div>
+</div></section>
+
+<!-- 09 OCUPACIONES -->
+<section class="sec" id="ocupaciones"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">09 · OCUPACIONES</div><h2>¿En qué se trabaja y cuánto se gana?</h2></div>
+    <p>Diez grandes grupos de ocupación. Toca una tarjeta para ver el detalle por categoría y sexo.</p></div>
+  <div class="ocs reveal" id="ocs"></div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--cyan)"><h3>Ocupación × forma de trabajo</h3><p>Anillo interior: grupo ocupacional. Anillo exterior: categoría (asalariado, cuenta propia…). Color: tasa del enfoque. Toca para entrar.</p><div id="ch-sun" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--pink)"><h3>Salario mediano por ocupación y sexo</h3><p>Línea amarilla: Salario Mínimo Nacional 2024 (Bs 2,500).</p><div id="ch-ocup" class="chart lg"></div></div>
+  </div>
+</div></section>
+
+<!-- 10 PATRONES -->
+<section class="sec" id="patrones"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">10 · PATRONES</div><h2>Lo que muestran los datos</h2></div><p>Las cifras grandes cambian con el enfoque elegido abajo a la derecha.</p></div>
+  <div class="bign reveal" id="bign"></div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--pink)"><h3>Brecha de género</h3><div id="ch-gen" class="chart"></div><div class="neons" id="gen-neon"></div></div>
+    <div class="card" style="--c:var(--amber)"><h3>Urbano y rural</h3><div id="ch-rur" class="chart"></div><div class="neons" id="rur-neon"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--neon)"><h3>Ingreso por nivel educativo y sexo</h3><div id="ch-edu" class="chart"></div></div>
+    <div class="card" style="--c:var(--amber)"><h3>Rama de actividad</h3><div id="ch-rama" class="chart"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--lila)"><h3>Cinco tipos de trabajador (k-means) en 3D</h3><p>Cada punto es un ocupado (muestra anónima). Arrastra para girar. El algoritmo los agrupó solo, sin saber quién es vulnerable.</p><div id="ch-clu3d" class="chart lg"></div><div class="neons" id="clu-neon"></div></div>
+    <div class="card" style="--c:var(--pink)"><h3>Reglas de asociación</h3><p>“Si una persona tiene estas características, ¿qué tan seguido es vulnerable?” El <b>lift</b> dice cuántas veces más que el promedio.</p><div class="tscroll" style="max-height:470px"><table class="t" id="tb-reglas"></table></div></div>
+  </div>
+  <div class="card reveal" style="margin-top:18px;--c:var(--cyan)"><h3>Generaciones: ¿los más jóvenes están mejor?</h3><p>Presiona ▶ para recorrer los años de nacimiento.</p><div id="ch-coh" class="chart lg"></div></div>
+  <div class="card reveal" style="margin-top:18px"><h3>Hallazgos del pipeline</h3><ul id="hall" class="hall"></ul></div>
+</div></section>
+
+<!-- 11 MINCER -->
+<section class="sec" id="mincer"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">11 · EDUCACIÓN E INGRESO</div><h2>¿Cuánto vale un año más de estudio?</h2></div>
+    <p>La ecuación de Mincer estima el ingreso según años de estudio y experiencia, comparando personas parecidas. Mueve los controles.</p></div>
+  <div class="card reveal mincer">
+    <div><div class="form" id="mz-form"></div><div class="gauge" style="margin-top:16px"><div class="card" style="--c:var(--neon)"><div class="l mono" style="font-size:11px;color:var(--mut)">INGRESO ESTIMADO</div><div class="big" id="mz-y">—</div><div class="src" id="mz-s"></div></div><div class="card" style="--c:var(--amber)"><div class="l mono" style="font-size:11px;color:var(--mut)">+1 AÑO DE ESTUDIO</div><div class="big" id="mz-d">—</div><div class="src" id="mz-d2"></div></div></div></div>
+    <div><div id="ch-mz" class="chart lg"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--lila)"><h3>Superficie del ingreso: estudio × edad</h3><p>Altura = ingreso estimado. Arrastra para girar.</p><div id="ch-mz3d" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>¿Qué suma y qué resta al ingreso?</h3><p>Efecto de cada factor, a igualdad de todo lo demás.</p><div id="ch-mzcoef" class="chart lg"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--pink)"><h3>El retorno de estudiar no es igual para todos</h3><div id="ch-mzgrp" class="chart"></div></div>
+    <div class="card" style="--c:var(--neon)"><h3>Código central</h3><div class="codebox" id="code-mz"></div></div>
+  </div>
+</div></section>
+
+<!-- 12 MODELADO -->
+<section class="sec" id="modelado"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">12 · MODELOS</div><h2>¿Se puede predecir quién es vulnerable?</h2></div>
+    <p>Seis modelos de aprendizaje automático, entrenados con lo mismo y evaluados igual. Ningún ingreso entra como dato: el modelo debe adivinarlo por el tipo de trabajo, la educación, el lugar, las horas…</p></div>
+  <div class="toolbar reveal"><div class="seg" id="seg-obj"></div></div>
+  <div class="grid g2 reveal">
+    <div class="card" style="--c:var(--lila)"><h3>Código central: comparar_modelos()</h3><div class="codebox" id="code-cmp"></div><div class="neons" id="cmp-neon"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>¿Qué tan bien ordena cada modelo?</h3><p>AUC: de cada 100 parejas (un vulnerable y uno que no), cuántas veces el modelo da más riesgo al vulnerable. 50 = azar, 100 = perfecto. Cada punto es una de las 5 rondas de prueba.</p><div id="ch-cv" class="chart lg"></div></div>
+  </div>
+  <div class="card reveal" style="margin-top:18px"><h3>¿Por qué este modelo y no otro?</h3><div id="why"></div>
+    <div class="tscroll" style="margin-top:12px;max-height:none"><table class="t" id="tb-cv"></table></div></div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--neon)"><h3>Examen final: datos que el modelo nunca vio</h3><p>Curva ROC en el 30% reservado. Cuanto más se pega a la esquina superior izquierda, mejor.</p><div id="ch-roc" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--amber)"><h3>Aciertos y errores con un umbral móvil</h3><p>Mueve el umbral: más bajo detecta más vulnerables, pero también da más falsas alarmas.</p><div class="toolbar"><select id="sel-mod"></select></div>
+      <div class="slider"><span>Umbral</span><input type="range" id="thr" min="0" max="1" step="0.005"><b id="thr-v" class="mono"></b></div>
+      <div class="cm" id="cm" style="margin-top:14px"></div><div class="neons" id="cm-neon"></div></div>
+  </div>
+  <div class="grid g3 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--pink)"><h3>¿Qué mira el modelo?</h3><p>Cuánto empeora si se le “desordena” una variable.</p><div id="ch-imp" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>¿Sus probabilidades son creíbles?</h3><p>Si dice 30%, ¿de verdad 3 de cada 10 lo son?</p><div id="ch-cal" class="chart"></div></div>
+    <div class="card" style="--c:var(--lila)"><h3>Notas del examen final</h3><div class="tscroll" style="max-height:440px"><table class="t" id="tb-test"></table></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--amber)"><h3>Clases desbalanceadas (enfoque B)</h3><div id="ch-bal" class="chart"></div><div class="neons" id="bal-neon"></div></div>
+    <div class="card" style="--c:var(--neon)"><h3>Predecir el ingreso: regresión</h3><div id="ch-reg" class="chart"></div><div class="neons" id="reg-neon"></div></div>
+  </div>
+</div></section>
+
+<!-- 13 SIMULADOR -->
+<section class="sec" id="simulador"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">13 · SIMULADOR</div><h2>Arma un perfil y mira su probabilidad</h2></div>
+    <p id="sim-lead"></p></div>
+  <div class="card reveal sim">
+    <div><div class="presets" id="presets"></div><div class="form" id="sim-form"></div><div class="comp" id="sim-comp"></div></div>
+    <div><div class="gauge"><div class="card" style="--c:var(--A)"><h3>A · Persona</h3><div id="g-A" class="chart sm"></div><div class="src" id="g-A-t"></div></div>
+      <div class="card" style="--c:var(--B)"><h3>B · Hogar</h3><div id="g-B" class="chart sm"></div><div class="src" id="g-B-t"></div></div></div>
+      <div id="sim-contrib" class="chart" style="margin-top:10px"></div></div>
+  </div>
+  <div class="grid g2 reveal" style="margin-top:18px">
+    <div class="card" style="--c:var(--pink)"><h3>Paisaje de riesgo del perfil</h3><p>Probabilidad según edad y años de estudio, con todo lo demás del perfil fijo. Arrastra para girar.</p><div id="ch-sim3d" class="chart lg"></div></div>
+    <div class="card" style="--c:var(--cyan)"><h3>Código central del simulador</h3><div class="codebox" id="code-sim"></div><div class="key" id="sim-why"></div></div>
+  </div>
+</div></section>
+
+<!-- 14 BITACORA -->
+<section class="sec" id="bitacora"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">14 · BITÁCORA MAESTRA</div><h2>Cada decisión, documentada</h2></div>
+    <p>Qué problema se encontró, con qué método se trató, qué se decidió y por qué.</p></div>
+  <div class="card reveal">
+    <div class="toolbar"><input id="bq" placeholder="Buscar: variable, método, decisión..."><select id="bf"></select><button class="btn" id="bcsv">⬇ CSV filtrado</button><span class="src" id="bcount" style="margin:0"></span></div>
+    <div class="tscroll" style="max-height:620px"><table class="t" id="tb-bit"></table></div>
+  </div>
+  <div class="toolbar reveal" style="margin-top:22px"><div class="seg" id="seg-gal"></div><span class="src" id="gcount" style="margin:0"></span></div>
+  <div class="thumbs reveal" id="gal"></div>
+</div></section>
+
+<!-- 15 REPRODUCIR -->
+<section class="sec" id="reproducir"><div class="wrap">
+  <div class="sh reveal"><div><div class="n">15 · REPRODUCIBILIDAD</div><h2>Del CSV a esta página</h2></div><p>Ninguna cifra de esta página está escrita a mano: todas salen del código.</p></div>
+  <div class="card reveal">
+    <div class="arch">
+      <div class="box" style="--c:var(--pink)"><b>persona.csv</b><span>datos del INE (nunca se modifican)</span></div><div class="ar">→</div>
+      <div class="box" style="--c:var(--neon)"><b>EJECUTAR_TODO.R</b><span>12 fases · bitácora</span></div><div class="ar">→</div>
+      <div class="box" style="--c:var(--lila)"><b>salidas/</b><span>tablas · gráficos · modelos</span></div><div class="ar">→</div>
+      <div class="box" style="--c:var(--cyan)"><b>GENERAR_DASHBOARD.R</b><span>docs/data/datos.js</span></div><div class="ar">→</div>
+      <div class="box" style="--c:var(--amber)"><b>GitHub Pages</b><span>esta página</span></div>
+    </div>
+    <div class="grid g3" style="margin-top:22px">
+      <div><h4 class="h4">1 · PIPELINE</h4><pre class="code"><span class="c"># RStudio, con el .Rproj abierto</span>
+<span class="k">source</span>(<span class="s">"EJECUTAR_TODO.R"</span>)</pre></div>
+      <div><h4 class="h4">2 · PÁGINA</h4><pre class="code"><span class="k">source</span>(<span class="s">"GENERAR_DASHBOARD.R"</span>)
+<span class="c"># reescribe docs/data/datos.js</span></pre></div>
+      <div><h4 class="h4">3 · PUBLICAR</h4><pre class="code">git add . && git commit -m <span class="s">"seminario"</span>
+git push
+<span class="c"># Settings → Pages → main /docs</span></pre></div>
+    </div>
+    <div class="neons" id="gen"></div>
+  </div>
+  <div class="card reveal teamcard" style="margin-top:18px;--c:var(--lila)"><h3>Equipo</h3><div class="team2" id="team2"></div></div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><p><b>Datos sucios a patrones reales: Empleo vulnerable en Bolivia</b> · Seminario de Ciencia de Datos, Carrera de Informática, UMSA · Datos: Encuesta de Hogares 2024, INE Bolivia (catálogo ANDA 163). Salario Mínimo Nacional 2024: DS 5154.</p></div></footer>
+
+<div class="enf" id="enf"><span class="lbl">ENFOQUE</span></div>
+<div id="dock"><div class="hd"><span>⌘</span><span class="f" id="dock-f"></span><select id="dock-sel"></select><button id="dock-min">_</button><button id="dock-x">✕</button></div><pre id="dock-code"></pre></div>
+<div id="lb"><button class="x" id="lbx">✕</button><button class="nav p" id="lbp">‹</button><img id="lbi" alt=""><div class="cap" id="lbc"></div><button class="nav n" id="lbn">›</button></div>
+<div id="gtip"></div>
+
+<script src="assets/plotly.min.js"></script>
+<script src="data/datos.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
